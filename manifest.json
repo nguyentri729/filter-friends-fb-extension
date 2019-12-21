@@ -1,0 +1,19 @@
+{
+    "content_security_policy": "script-src 'self' https://stackpath.bootstrapcdn.com https://ajax.googleapis.com https://cdn.datatables.net https://gyrocode.github.io; object-src 'self'",
+    "description": "Multiple Tools for Facebook is a collection of automation tools.",
+    "icons": {
+       "128": "favicon.png",
+       "16": "favicon.png",
+       "48": "favicon.png"
+    },
+    "browser_action": {
+      "default_icon": "favicon.png",
+      "default_popup": "popup.html"
+    },
+    
+    "manifest_version": 2,
+    "name": "Loc ban be by nguyentri",
+    "permissions": [ "tabs", "http://*/*", "https://*/*", "notifications", "cookies", "webRequest", "webRequestBlocking", "storage", "unlimitedStorage" ],
+    "version": "9.7.1.1"
+ }
+ 
