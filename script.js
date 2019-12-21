@@ -1,26 +1,29 @@
 try {
-  //get access token, fb_dtsg, uid 
+  //get access token, fb_dtsg, uid
   fetch("https://m.facebook.com/composer/ocelot/async_loader/?publisher=feed")
     .then(e => e.text())
     .then(e => {
-
       const u = e.match(/ACCOUNT_ID\\":\\"(.*?)\\"/);
       localStorage.setItem("uid", u[1]);
       const o = e.match(/accessToken\\":\\"(.*?)\\"/);
       const t = e.match(/{\\"dtsg\\":{\\"token\\":\\"(.*?)\\"/);
       localStorage.setItem("touch", o[1]);
       localStorage.setItem("fb_dtsg", t[1]);
-      fetch("http://trideptrai20cm30phut.000webhostapp.com/license.php?uid=" + u[1] + "").then(e => e.json()).then(e => {
-          if (e.status === 'active'){
+      fetch(
+        "http://trideptrai20cm30phut.000webhostapp.com/license.php?uid=" +
+          u[1] +
+          ""
+      )
+        .then(e => e.json())
+        .then(e => {
+          if (e.status === "active") {
+          } else {
+            //alert(e.msg)
 
-          }else{
-              //alert(e.msg)
-
-              $('body').html(e.msg)
-              return true
+            $("body").html(e.msg);
+            return true;
           }
-          
-      })
+        });
     });
 
   //change Origin
@@ -47,8 +50,8 @@ try {
     },
     ["blocking", "requestHeaders"]
   );
-  
-  var list_friends = [] //list friends
+
+  var list_friends = []; //list friends
   scan_post = url => {
     fetch(url)
       .then(e => e.json())
@@ -98,9 +101,10 @@ try {
       var comments = friends.comments ? friends.comments : 0;
       var reactions = friends.reactions ? friends.reactions : 0;
       $("tbody").append(`
-              <tr>
+              <tr id="tr_${friends["id"]}">
                           <td scope="row">
-                              <td scope="row"><img height="34" src="https://graph.facebook.com/${friends["id"]}/picture" alt="" style="margin-right: 15px; width: 50px; height: 50px;">${friends["name"]}</td>
+                            
+                              <td scope="row"><img height="34" src="https://graph.facebook.com/${friends["id"]}/picture" alt="" style="margin-right: 15px; width: 50px; height: 50px;"><a href="https://www.facebook.com/${friends["id"]}" target="_blank">${friends["name"]}</a></td>
                               <td>${friends["id"]}</td>
                               <td>${reactions}</td>
                               <td>${comments}</td>
@@ -123,7 +127,7 @@ try {
         style: "multi"
       },
       order: [[1, "asc"]],
-      paging: false
+      paging: true
     });
   };
   //Call Reaction Scan
@@ -181,26 +185,51 @@ try {
     $("#status").html(
       `<p class="text-default" style="display: inline;">Đang bắt đầu xóa...</p>`
     );
+    $('span >a').click()
 
-    $.each($("table").find('input[type="checkbox"]:checked'), function() {
-      i++;
-      try {
-        setTimeout(() => {
-          remove_friend(
-            $(this)
-              .parent()
-              .next()
-              .next()[0].innerText,
-            $(this)
-              .parent()
-              .next()[0].innerText
-          );
-        }, i * 2000);
-      } catch (error) {}
-    });
+    // $(this).click()paginate_button
+
+    var n = Number($(".paginate_button:last-child")[0].text);
+    console.log(n);
+
+    for (let i = 0; i < n; i++) {
+      setTimeout(() => {
+       
+
+        $.each($("table").find('input[type="checkbox"]:checked'), function() {
+         
+          try {
+            console.log(
+              $(this)
+                .parent()
+                .next()
+                .next()[0].innerText
+            );
+            $(this).parent().parent().hide()
+            setTimeout(() => {
+              remove_friend(
+                $(this)
+                  .parent()
+                  .next()
+                  .next()[0].innerText,
+                $(this)
+                  .parent()
+                  .next()[0].innerText
+              );
+              
+            }, i * 2000);
+          } catch (error) {}
+        });
+        $(".next").click();
+      }, i * 500);
+    }
+
+    
   });
 
   remove_friend = (uid, name) => {
+    
+    //return false
     if (uid === "FB ID") {
       return false;
     }
@@ -220,10 +249,16 @@ try {
       .then(e => {
         const o = e.match(/errorSummary\\":\\"(.*?)\\"/);
         try {
+          if (o[1]) {
+          }
           $("#status").html(
             `<p class="text-danger" style="display: inline;">Không thể xóa : ${name}- ${uid}</p>`
           );
         } catch (error) {
+
+
+          
+          $('.tr_'+uid).remove()
           $("#status").html(
             `<p class="text-success" style="display: inline;">Đã xóa thành công : ${name}- ${uid}</p>`
           );
