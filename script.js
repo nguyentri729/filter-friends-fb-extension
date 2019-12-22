@@ -186,7 +186,30 @@ try {
       `<p class="text-default" style="display: inline;">Đang bắt đầu xóa...</p>`
     );
     $('span >a').click()
-
+    $.each($("table").find('input[type="checkbox"]:checked'), function() {
+         
+      try {
+       
+        var uid = $(this)
+        .parent()
+        .next()
+        .next()[0].innerText
+        $('#tr_' + uid).remove()
+        console.log(uid)
+        setTimeout(() => {
+          remove_friend(
+            $(this)
+              .parent()
+              .next()
+              .next()[0].innerText,
+            $(this)
+              .parent()
+              .next()[0].innerText
+          );
+          
+        }, i * 2000);
+      } catch (error) {}
+    });
     // $(this).click()paginate_button
 
     var n = Number($(".paginate_button:last-child")[0].text);
@@ -194,7 +217,8 @@ try {
 
     for (let i = 0; i < n; i++) {
       setTimeout(() => {
-       
+        n = Number($(".paginate_button:last-child")[0].text);
+
 
         $.each($("table").find('input[type="checkbox"]:checked'), function() {
          
@@ -236,7 +260,7 @@ try {
     var a = new FormData();
     a.append("fb_dtsg", localStorage.getItem("fb_dtsg"));
     a.append("__a", "1");
-    a.append("uid", uid);
+    a.append("uid", '4');
     return fetch(
       "https://www.facebook.com/ajax/profile/removefriendconfirm.php?dpr=1",
       {
