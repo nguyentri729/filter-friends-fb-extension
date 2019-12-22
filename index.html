@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <title>Filter Friends Facebook </title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -12,53 +13,69 @@
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
 
-    <link type="text/css" href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.11/css/dataTables.checkboxes.css" rel="stylesheet" />
-<script type="text/javascript" src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.11/js/dataTables.checkboxes.min.js"></script>
+    <link type="text/css"
+        href="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.11/css/dataTables.checkboxes.css"
+        rel="stylesheet" />
+    <script type="text/javascript"
+        src="https://gyrocode.github.io/jquery-datatables-checkboxes/1.2.11/js/dataTables.checkboxes.min.js"></script>
 
 
-  </head>
-  <body>
-   
-<br><br>
+
+
+
+
+</head>
+
+<body>
+
+    <br><br>
     <div class="container">
-        
+
         <div class="card text">
-          <div class="card-body">
-            <h4 class="card-title">Filter Friends Facebook</h4>
-            <p><b>Status : </b> <i id="status"></i></p>
-           <button type="button" class="btn btn-primary btn-lg btn-block" id="scan_post">Scan Post</button>
-           <br><hr><br>
-          
-           <button type="button" class="btn btn-danger" id="remove_friend">Bye Bye</button>
+            <div class="card-body">
+                <h4 class="card-title">Filter Friends Facebook</h4>
+                <p><b>Status : </b> <i id="status"></i></p>
+                <button type="button" class="btn btn-primary btn-lg btn-block" id="scan_post">Scan Post</button>
+                <br>
+                <hr><br>
+
+
+            
 
 
 
-           <br>  <br>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                           
-                            <th></th>
-                            <th>Tên</th>
-                            <th>FB ID</th>
-                            <th>Reactions</th>
-                            <th>Comments</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                           
-                        
-                    </tbody>
-                </table>
+
+
+                <br> <br>
+                <div class="table-responsive">
+                    <form id="frm-example" method="POST" action="">
+                        <p><button>Submit</button></p>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+
+                                    <th></th>
+                                    <th>Tên</th>
+                                    <th>FB ID</th>
+                                    <th>Reactions</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
             </div>
         </div>
-        </div>
     </div>
-  
 
     <script src="script.js"></script>
 
 
-    </body>
+</body>
+
 </html>

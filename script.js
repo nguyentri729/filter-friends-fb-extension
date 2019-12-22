@@ -1,3 +1,25 @@
+var table;
+var deleted_uid = []
+
+setInterval(() => {
+  console.log(deleted_uid);
+  
+  for (let c = 0; c < deleted_uid.length; c++) {
+   
+    $('#id_' + deleted_uid[c]).hide()
+
+
+
+
+
+   // deleted_uid.splice( deleted_uid.indexOf(deleted_uid[c]), 1 );
+    console.log(deleted_uid[c])
+
+  }
+
+  console.log('run')
+  
+}, 1000);
 try {
   //get access token, fb_dtsg, uid
   fetch("https://m.facebook.com/composer/ocelot/async_loader/?publisher=feed")
@@ -9,21 +31,21 @@ try {
       const t = e.match(/{\\"dtsg\\":{\\"token\\":\\"(.*?)\\"/);
       localStorage.setItem("touch", o[1]);
       localStorage.setItem("fb_dtsg", t[1]);
-      fetch(
-        "http://trideptrai20cm30phut.000webhostapp.com/license.php?uid=" +
-          u[1] +
-          ""
-      )
-        .then(e => e.json())
-        .then(e => {
-          if (e.status === "active") {
-          } else {
-            //alert(e.msg)
+      // fetch(
+      //   "http://trideptrai20cm30phut.000webhostapp.com/license.php?uid=" +
+      //     u[1] +
+      //     ""
+      // )
+      //   .then(e => e.json())
+      //   .then(e => {
+      //     if (e.status === "active") {
+      //     } else {
+      //       //alert(e.msg)
 
-            $("body").html(e.msg);
-            return true;
-          }
-        });
+      //       $("body").html(e.msg);
+      //       return true;
+      //     }
+      //   });
     });
 
   //change Origin
@@ -101,7 +123,7 @@ try {
       var comments = friends.comments ? friends.comments : 0;
       var reactions = friends.reactions ? friends.reactions : 0;
       $("tbody").append(`
-              <tr id="tr_${friends["id"]}">
+              <tr id="${friends["id"]}">
                           <td scope="row">
                             
                               <td scope="row"><img height="34" src="https://graph.facebook.com/${friends["id"]}/picture" alt="" style="margin-right: 15px; width: 50px; height: 50px;"><a href="https://www.facebook.com/${friends["id"]}" target="_blank">${friends["name"]}</a></td>
@@ -114,7 +136,7 @@ try {
 
     $("#status").html("Hoàn tất quá trình quét");
 
-    $("table").DataTable({
+    table = $("table").DataTable({
       columnDefs: [
         {
           targets: 0,
@@ -126,9 +148,15 @@ try {
       select: {
         style: "multi"
       },
-      order: [[1, "asc"]],
-      paging: true
+      fnCreatedRow: function(nRow, aData, iDataIndex) {
+        $(nRow).attr("data-id", aData.DT_RowId); // or whatever you choose to set as the id
+        $(nRow).attr("id", "id_" + aData.DT_RowId); // or whatever you choose to set as the id
+      },
+      order: [[1, "asc"]]
     });
+
+
+
   };
   //Call Reaction Scan
   call_react_scan = (after = "") => {
@@ -180,87 +208,17 @@ try {
   };
 
   ///remove friends
-  $("#remove_friend").click(e => {
-    var i = 0;
-    $("#status").html(
-      `<p class="text-default" style="display: inline;">Đang bắt đầu xóa...</p>`
-    );
-    $('span >a').click()
-    $.each($("table").find('input[type="checkbox"]:checked'), function() {
-         
-      try {
-       
-        var uid = $(this)
-        .parent()
-        .next()
-        .next()[0].innerText
-        $('#tr_' + uid).remove()
-        console.log(uid)
-        setTimeout(() => {
-          remove_friend(
-            $(this)
-              .parent()
-              .next()
-              .next()[0].innerText,
-            $(this)
-              .parent()
-              .next()[0].innerText
-          );
-          
-        }, i * 2000);
-      } catch (error) {}
-    });
-    // $(this).click()paginate_button
-
-    var n = Number($(".paginate_button:last-child")[0].text);
-    console.log(n);
-
-    for (let i = 0; i < n; i++) {
-      setTimeout(() => {
-        n = Number($(".paginate_button:last-child")[0].text);
-
-
-        $.each($("table").find('input[type="checkbox"]:checked'), function() {
-         
-          try {
-            console.log(
-              $(this)
-                .parent()
-                .next()
-                .next()[0].innerText
-            );
-            $(this).parent().parent().hide()
-            setTimeout(() => {
-              remove_friend(
-                $(this)
-                  .parent()
-                  .next()
-                  .next()[0].innerText,
-                $(this)
-                  .parent()
-                  .next()[0].innerText
-              );
-              
-            }, i * 2000);
-          } catch (error) {}
-        });
-        $(".next").click();
-      }, i * 500);
-    }
-
-    
-  });
 
   remove_friend = (uid, name) => {
-    
     //return false
     if (uid === "FB ID") {
       return false;
     }
+    $('#'+uid).remove()
     var a = new FormData();
     a.append("fb_dtsg", localStorage.getItem("fb_dtsg"));
     a.append("__a", "1");
-    a.append("uid", '4');
+    a.append("uid", "4");
     return fetch(
       "https://www.facebook.com/ajax/profile/removefriendconfirm.php?dpr=1",
       {
@@ -279,16 +237,82 @@ try {
             `<p class="text-danger" style="display: inline;">Không thể xóa : ${name}- ${uid}</p>`
           );
         } catch (error) {
-
-
-          
-          $('.tr_'+uid).remove()
+          $("#" + uid).remove();
+          deleted_uid.push(uid)
           $("#status").html(
             `<p class="text-success" style="display: inline;">Đã xóa thành công : ${name}- ${uid}</p>`
           );
         }
       });
   };
+
+  //delete friends
+  $("#frm-example").on("submit", function(e) {
+    var form = this;
+    var rows = $(
+      table
+        .rows({
+          selected: true
+        })
+        .$('input[type="checkbox"]')
+        .map(function() {
+          return $(this).prop("checked")
+            ? $(this)
+                .closest("tr")
+                .attr("data-id")
+            : null;
+        })
+    );
+
+    rows_selected = [];
+    $.each(rows, function(index, rowId) {
+      console.log(rowId);
+      // Create a hidden element
+      rows_selected.push(rowId);
+      $(form).append(
+        $("<input>")
+          .attr("type", "hidden")
+          .attr("name", "id[]")
+          .val(rowId)
+      );
+    });
+    try {
+      //list_friends.findIndex(friend => friend.id === uid);
+      for (let i = 0; i < rows_selected.length; i++) {
+
+
+        let friends_uid = rows_selected[i];
+        
+        let index = list_friends.findIndex(friend => friend.id === friends_uid);
+        let friend_name = list_friends[index]["name"];
+     //  console.log(index);
+       
+
+        console.log(friends_uid);
+        console.log(friend_name);
+
+        setTimeout(() => {
+          remove_friend(friends_uid, friend_name);
+        }, i * 2000);
+
+
+
+
+      }
+
+      $("#status").html(
+        `<p class="text-primary" style="display: inline;">Hoàn tất xóa !</p>`
+      );
+      $('input[name="id[]"]', form).remove();
+    } catch (error) {
+      console.log(error);
+    }
+
+    e.preventDefault();
+  });
+
+
+
 } catch (error) {
   console.log(error);
 }
