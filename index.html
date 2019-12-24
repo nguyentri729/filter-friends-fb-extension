@@ -27,7 +27,7 @@
 </head>
 
 <body>
-
+    
     <br><br>
     <div class="container">
 
@@ -38,9 +38,35 @@
                 <button type="button" class="btn btn-primary btn-lg btn-block" id="scan_post">Scan Post</button>
                 <br>
                 <hr><br>
+                
+                <div id="show_html" style="display: none;">
+                    <center>
+                        <h3>DEBUG TOOLS </h3>
+                    </center>
+                   
+                   
+                    <div class="form-group">
+                      <label for="">* Số lượng quét 1 lần: </label>
+                      <input type="text"
+                        class="form-control" id = "limit" value="500" type="number">
+                      <small id="helpId" class="form-text text-muted">Giảm số lượng càng nhỏ để  sửa lỗi  </small>
+                    </div>
+
+                    <button type="button" class="btn btn-warning btn-block" id="rescan">rescan</button>
+                    <br><hr>
+                    <!-- <br>
+                    <small>Lỗi nhiều quá thì show_table nhé ! </small> 
+                    <button type="button" class="btn btn-success btn-block" id="show_table">show table</button> -->
+                </div>
+               <div class="form-check form-check-inline">
+                
+
+                   <label class="form-check-label">
+                        <input class="form-check-input" type="checkbox" id="checkall_show" value="checkedValue"> Chọn tất cả bạn bè đang hiển thị
+                   </label>
 
 
-            
+               </div>
 
 
 
@@ -49,7 +75,7 @@
                 <br> <br>
                 <div class="table-responsive">
                     <form id="frm-example" method="POST" action="">
-                        <p><button>Submit</button></p>
+                        <p><button class="btn btn-danger">Bye bye</button></p>
 
                         <table class="table">
                             <thead>

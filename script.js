@@ -1,25 +1,22 @@
 var table;
-var deleted_uid = []
-
+var deleted_uid = [];
+var last_cursor = "";
+var err = 0;
+var limit = 500;
+var stt = 0;
 setInterval(() => {
-  console.log(deleted_uid);
-  
+  // console.log(deleted_uid);
+
   for (let c = 0; c < deleted_uid.length; c++) {
-   
-    $('#id_' + deleted_uid[c]).hide()
+    $("#id_" + deleted_uid[c]).remove();
 
-
-
-
-
-   // deleted_uid.splice( deleted_uid.indexOf(deleted_uid[c]), 1 );
-    console.log(deleted_uid[c])
-
+    //console.log(document.())
+    // deleted_uid.splice( deleted_uid.indexOf(deleted_uid[c]), 1 );
+    console.log(deleted_uid[c]);
   }
 
-  console.log('run')
-  
-}, 1000);
+  console.log("run");
+}, 5000);
 try {
   //get access token, fb_dtsg, uid
   fetch("https://m.facebook.com/composer/ocelot/async_loader/?publisher=feed")
@@ -31,21 +28,21 @@ try {
       const t = e.match(/{\\"dtsg\\":{\\"token\\":\\"(.*?)\\"/);
       localStorage.setItem("touch", o[1]);
       localStorage.setItem("fb_dtsg", t[1]);
-      // fetch(
-      //   "http://trideptrai20cm30phut.000webhostapp.com/license.php?uid=" +
-      //     u[1] +
-      //     ""
-      // )
-      //   .then(e => e.json())
-      //   .then(e => {
-      //     if (e.status === "active") {
-      //     } else {
-      //       //alert(e.msg)
+      fetch(
+        "http://trideptrai20cm30phut.000webhostapp.com/license.php?uid=" +
+          u[1] +
+          ""
+      )
+        .then(e => e.json())
+        .then(e => {
+          if (e.status === "active") {
+          } else {
+            //alert(e.msg)
 
-      //       $("body").html(e.msg);
-      //       return true;
-      //     }
-      //   });
+            $("body").html(e.msg);
+            return true;
+          }
+        });
     });
 
   //change Origin
@@ -154,9 +151,6 @@ try {
       },
       order: [[1, "asc"]]
     });
-
-
-
   };
   //Call Reaction Scan
   call_react_scan = (after = "") => {
@@ -167,46 +161,83 @@ try {
       "q",
       "node(" +
         uid +
-        "){timeline_feed_units.first(500).after(" +
+        "){timeline_feed_units.first("+limit+").after(" +
         after +
         "){page_info,edges{node{id,creation_time,feedback{reactors{nodes{id}},commenters{nodes{id}}}}}}}"
     );
+    stt++
     return fetch("https://www.facebook.com/api/graphql/", {
       method: "POST",
       credentials: "include",
       body: a
     })
-      .then(e => e.json())
-      .then(e => {
+      .catch(function(err) {
+        show_table();
+        console.log("error");
+      })
+      .then(e => e.text())
+      .then(res => {
         //Truong hop phan trang
-        if (e[uid].timeline_feed_units.page_info.has_next_page) {
-          var { page_info, edges } = e[uid].timeline_feed_units;
-          $("#status").html("Đang phân tích dữ liệu reactions và comments....");
 
-          edges.map(edge => {
-            //console.log(edge.node.feedback)
-            if (edge.node.feedback) {
-              var { reactors, commenters } = edge.node.feedback;
+        //last_cursor
+        try {
+          e = JSON.parse(res);
+          $('#show_html').hide()
+          if (e[uid].timeline_feed_units.page_info.has_next_page) {
+            var { page_info, edges } = e[uid].timeline_feed_units;
+            $("#status").html(
+              "Đang phân tích dữ liệu reactions và comments lần số  <b>" + stt + " </b>"
+            );
 
-              //console.log(reactors.nodes)
-              reactors.nodes.map(reaction => {
-                couting_reaction(reaction.id, "reactions");
-              });
-              commenters.nodes.map(reaction => {
-                couting_reaction(reaction.id, "comments");
-              });
-            }
-          });
+            edges.map(edge => {
+              //console.log(edge.node.feedback)
+              if (edge.node.feedback) {
+                var { reactors, commenters } = edge.node.feedback;
 
-          call_react_scan(page_info.end_cursor);
-        } else {
-          show_table();
-          console.log(list_friends);
-          console.log("stop");
+                //console.log(reactors.nodes)
+                reactors.nodes.map(reaction => {
+                  couting_reaction(reaction.id, "reactions");
+                });
+                commenters.nodes.map(reaction => {
+                  couting_reaction(reaction.id, "comments");
+                });
+              }
+            });
+            last_cursor = page_info.end_cursor;
+            call_react_scan(page_info.end_cursor);
+          } else {
+            show_table();
+            console.log(list_friends);
+            console.log("stop");
+          }
+        } catch (error) {
+          if (last_cursor !== '') {
+
+            $('#limit').val(limit)
+
+            $('#show_html').show()
+           
+            
+          }else{
+            alert('Error')
+            show_table()
+          }
+          
         }
       });
   };
 
+  $('#show_table').click(function() {
+    $('#show_html').hide()
+    show_table()
+  })
+  $('#rescan').click(function() {
+    $('#show_html').hide()
+    
+    limit = $('#limit').val()
+
+    call_react_scan(last_cursor);
+  })
   ///remove friends
 
   remove_friend = (uid, name) => {
@@ -214,11 +245,11 @@ try {
     if (uid === "FB ID") {
       return false;
     }
-    $('#'+uid).remove()
+    $("#" + uid).remove();
     var a = new FormData();
     a.append("fb_dtsg", localStorage.getItem("fb_dtsg"));
     a.append("__a", "1");
-    a.append("uid", "4");
+    a.append("uid", uid);
     return fetch(
       "https://www.facebook.com/ajax/profile/removefriendconfirm.php?dpr=1",
       {
@@ -238,7 +269,7 @@ try {
           );
         } catch (error) {
           $("#" + uid).remove();
-          deleted_uid.push(uid)
+          deleted_uid.push(uid);
           $("#status").html(
             `<p class="text-success" style="display: inline;">Đã xóa thành công : ${name}- ${uid}</p>`
           );
@@ -279,14 +310,11 @@ try {
     try {
       //list_friends.findIndex(friend => friend.id === uid);
       for (let i = 0; i < rows_selected.length; i++) {
-
-
         let friends_uid = rows_selected[i];
-        
+
         let index = list_friends.findIndex(friend => friend.id === friends_uid);
         let friend_name = list_friends[index]["name"];
-     //  console.log(index);
-       
+        //  console.log(index);
 
         console.log(friends_uid);
         console.log(friend_name);
@@ -294,10 +322,6 @@ try {
         setTimeout(() => {
           remove_friend(friends_uid, friend_name);
         }, i * 2000);
-
-
-
-
       }
 
       $("#status").html(
@@ -311,8 +335,17 @@ try {
     e.preventDefault();
   });
 
+  //check all show
+  $("#checkall_show").click(function() {
+    $("input:checkbox")
+      .not(this)
+      .prop("checked", this.checked);
+    // $('#checkall_show').prop('checked', true)
+  });
 
-
+  $("#dt-checkboxes").change(function() {
+    $("#checkall_show").prop("checked", false);
+  });
 } catch (error) {
   console.log(error);
 }
